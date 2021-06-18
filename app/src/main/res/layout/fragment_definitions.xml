@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".ui.definitions.DefinitionsFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/llHeaderContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvWord"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Word" />
+
+        <TextView
+            android:id="@+id/tvPartOfSpeech"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#737070"
+            app:layout_constraintBottom_toBottomOf="@+id/tvWord"
+            app:layout_constraintStart_toEndOf="@id/tvWord"
+            app:layout_constraintTop_toTopOf="@+id/tvWord"
+            app:layout_constraintVertical_bias="1"
+            tools:text="@string/part_of_speech" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tvPhoneticsText"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:textAllCaps="false"
+            android:textColor="#1dace2"
+            android:textSize="14sp"
+            app:cornerRadius="50dp"
+            app:iconPadding="0dp"
+            app:iconSize="16dp"
+            app:iconTint="#666"
+            android:clickable="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tvPartOfSpeech"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:icon="@drawable/ic_play_24"
+            tools:text="/pronunciation/"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMeanings"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:layoutAnimation="@anim/layout_animation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llHeaderContainer"
+        tools:listitem="@layout/item_layout_definition" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clError"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivErrorIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="70dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/tvErrorMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintVertical_bias="0.8"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="140dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

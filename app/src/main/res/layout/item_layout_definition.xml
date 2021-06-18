@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="4dp"
+    >
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#D4F6C7"
+        app:cardCornerRadius="16dp"
+        android:outlineAmbientShadowColor="@android:color/holo_red_dark"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            >
+
+        <TextView
+            android:id="@+id/tvDefinition"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="definition"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="@id/container"
+            app:layout_constraintEnd_toEndOf="@id/container"
+            app:layout_constraintTop_toTopOf="@id/container"
+            />
+        <TextView
+            android:id="@+id/tvSynonyms"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="#97491E"
+            app:layout_constraintTop_toBottomOf="@id/tvDefinition"
+            app:layout_constraintStart_toStartOf="@id/container"
+            app:layout_constraintEnd_toEndOf="@id/container"
+            android:layout_marginTop="8dp"
+            android:paddingStart="24dp"
+            />
+        <TextView
+            android:id="@+id/tvExample"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/example"
+            android:textColor="#00f"
+            android:textStyle="italic"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@id/container"
+            app:layout_constraintEnd_toEndOf="@id/container"
+            app:layout_constraintTop_toBottomOf="@id/tvSynonyms"
+            />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
