@@ -19,6 +19,7 @@
         app:boxStrokeWidth="0dp"
         app:boxStrokeWidthFocused="0dp"
         app:hintEnabled="false"
+        android:animateLayoutChanges="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">

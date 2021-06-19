@@ -4,8 +4,10 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dictionary.R
@@ -13,6 +15,7 @@ import com.example.dictionary.databinding.FragmentDefinitionsBinding
 import com.example.dictionary.network.model.DictionarySingleResponseModel
 import com.example.dictionary.network.model.PhoneticsModel
 import com.example.dictionary.network.util.RetrofitService
+import com.example.dictionary.ui.main.IMainActivity
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -28,6 +31,11 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         binding = FragmentDefinitionsBinding.bind(view)
 
         defAdapter = DefinitionRVAdapter(requireContext())
+
+        val iMainActivity = activity as IMainActivity
+        val toolbar = iMainActivity.getToolbar()
+        toolbar.setNavigationIcon(R.drawable.ic_round_arrow_back_ios_24)
+        toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         setupRecyclerView()
         initRequestToApi()
@@ -78,7 +86,12 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         binding.tvPhoneticsText.apply {
             isVisible = true
             text = phonetics.text
-            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_play_24, 0, 0, 0)
+
+            icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_play_24)
+            iconSize = 30
+            iconPadding = 0
+            setIconTintResource(R.color.light_bluish)
+
             setOnClickListener {
                 val mediaPlayer = MediaPlayer()
                 mediaPlayer.setOnPreparedListener { mediaPlayer.start() }

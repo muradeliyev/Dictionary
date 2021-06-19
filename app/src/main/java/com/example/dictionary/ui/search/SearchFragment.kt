@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.dictionary.R
 import com.example.dictionary.databinding.FragmentSearchBinding
+import com.example.dictionary.ui.main.IMainActivity
 
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
@@ -30,6 +31,10 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         // showing the soft keyboard
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT)
+
+        val iMainActivity = activity as IMainActivity
+        val toolbar = iMainActivity.getToolbar()
+        toolbar.navigationIcon = null
 
         setupListeners()
     }
