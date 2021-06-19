@@ -45,7 +45,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         lifecycleScope.launchWhenCreated {
             binding.clError.isVisible = false
             binding.tvPhoneticsText.isVisible = false
-            binding.progressBar.isVisible = true
+            binding.searchAnimation.isVisible = true
 
             val word = args.word
             val response: DictionarySingleResponseModel = try {
@@ -53,19 +53,19 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
             }
             catch (e: IOException) { // when there is no internet access
                 binding.clError.isVisible = true
-                binding.ivErrorIcon.setImageResource(R.drawable.ic_no_internet)
+                binding.lotErrorAnimation.setAnimation(R.raw.no_internet_animation)
                 binding.tvErrorMessage.text = requireContext().getString(R.string.no_internet_connection)
-                binding.progressBar.isVisible = false
+                binding.searchAnimation.isVisible = false
                 return@launchWhenCreated
             }
             catch (e: HttpException) { // when no result is found
                 binding.clError.isVisible = true
-                binding.ivErrorIcon.setImageResource(R.drawable.ic_not_found)
+                binding.lotErrorAnimation.setAnimation(R.raw.no_result_cloud_animation)
                 binding.tvErrorMessage.text = requireContext().getString(R.string.not_found, word)
-                binding.progressBar.isVisible = false
+                binding.searchAnimation.isVisible = false
                 return@launchWhenCreated
             }
-            binding.progressBar.isVisible = false
+            binding.searchAnimation.isVisible = false
 
             binding.tvWord.text = response.word
             binding.tvPartOfSpeech.text = requireContext().getString(R.string.part_of_speech, response.meanings[0].partOfSpeech)
@@ -88,7 +88,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
             text = phonetics.text
 
             icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_play_24)
-            iconSize = 30
+            iconSize = 60
             iconPadding = 0
             setIconTintResource(R.color.light_bluish)
 

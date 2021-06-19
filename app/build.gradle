@@ -63,4 +63,7 @@ dependencies {
     // Coroutine Lifecycle Scopes
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
+
+    def lottieVersion = "3.7.0"
+    implementation "com.airbnb.android:lottie:$lottieVersion"
 }
