@@ -33,7 +33,7 @@ class DefinitionRVAdapter(
     var list: List<DefinitionModel>
         get() = differ.currentList
         set(value) {
-        differ.submitList(value)
+            differ.submitList(value)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DefinitionViewHolder {
@@ -55,14 +55,15 @@ class DefinitionRVAdapter(
                 if (this == null) {
                     tvSynonyms.isVisible = false
                 } else {
-                    for (i in indices-1) {
+                    for (i in indices) {
                         tvSynonyms.append("${this[i]}\n")
                     }
-                    tvSynonyms.append(last())
                 }
             }
-
-            tvExample.text = context.getString(R.string.example, definitionModel.example ?: "")
+            if (definitionModel.example != null)
+                tvExample.text = context.getString(R.string.example, definitionModel.example)
+            else
+                tvExample.isVisible = false
         }
     }
 

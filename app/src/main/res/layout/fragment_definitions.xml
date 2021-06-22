@@ -52,6 +52,7 @@
             app:cornerRadius="50dp"
             app:iconPadding="0dp"
             app:iconSize="16dp"
+            app:rippleColor="@color/light_bluish"
             app:iconTint="@color/light_bluish"
             android:clickable="false"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -117,15 +118,4 @@
         app:lottie_loop="true"
         app:lottie_autoPlay="true"
         />
-<!--    <ProgressBar-->
-<!--        android:id="@+id/progressBar"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:padding="140dp"-->
-<!--        android:visibility="gone"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
 </androidx.constraintlayout.widget.ConstraintLayout>

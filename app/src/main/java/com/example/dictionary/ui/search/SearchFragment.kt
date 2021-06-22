@@ -28,15 +28,23 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
         // search box gets focus on view create
         binding.etSearch.requestFocus()
-        // showing the soft keyboard
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT)
 
         val iMainActivity = activity as IMainActivity
         val toolbar = iMainActivity.getToolbar()
         toolbar.navigationIcon = null
 
+        openKeyboard()
         setupListeners()
+    }
+
+    private fun closeKeyboard() = activity?.currentFocus?.let { view ->
+            val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    private fun openKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun setupListeners() = with(binding) {
@@ -45,8 +53,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     val word = binding.etSearch.text.toString()
                     if (word.isNotEmpty()) {
-                        val action =
-                            SearchFragmentDirections.actionSearchFragmentToDefinitionsFragment(word)
+                        val action = SearchFragmentDirections.actionSearchFragmentToDefinitionsFragment(word)
+
+                        closeKeyboard()
                         findNavController().navigate(action)
                     }
                     return true
