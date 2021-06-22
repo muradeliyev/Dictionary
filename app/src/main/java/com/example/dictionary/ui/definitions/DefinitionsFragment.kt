@@ -35,6 +35,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         val iMainActivity = activity as IMainActivity
         val toolbar = iMainActivity.getToolbar()
         toolbar.setNavigationIcon(R.drawable.ic_round_arrow_back_ios_24)
+        toolbar.title = "Search"
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         setupRecyclerView()
@@ -87,7 +88,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
             isVisible = true
             text = phonetics.text
 
-            icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_play_24)
+            icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_pronounce)
             iconSize = 60
             iconPadding = 0
             setIconTintResource(R.color.light_bluish)

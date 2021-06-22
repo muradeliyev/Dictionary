@@ -32,6 +32,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         val iMainActivity = activity as IMainActivity
         val toolbar = iMainActivity.getToolbar()
         toolbar.navigationIcon = null
+        toolbar.title = "Dictionary"
 
         openKeyboard()
         setupListeners()
