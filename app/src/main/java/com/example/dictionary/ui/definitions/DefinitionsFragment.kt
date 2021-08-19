@@ -1,13 +1,16 @@
 package com.example.dictionary.ui.definitions
 
+import android.content.Context
 import android.media.MediaPlayer
+import android.net.ConnectivityManager
+import android.net.ConnectivityManager.*
+import android.net.NetworkCapabilities.*
+import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -23,12 +26,12 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.lang.Exception
 
-
 class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
     private lateinit var binding: FragmentDefinitionsBinding
-    private val args: DefinitionsFragmentArgs by navArgs()
     private lateinit var defAdapter: DefinitionRVAdapter
     private lateinit var audioLink: String
+
+    private val args: DefinitionsFragmentArgs by navArgs()
 
     private var mediaPlayer: MediaPlayer? = null
 
@@ -57,29 +60,28 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
     }
 
     private fun initRequestToApi() {
+        if (!isInternetAvailable())
+            return
+
         lifecycleScope.launchWhenCreated {
-            binding.clError.isVisible = false
-            binding.tvPhoneticsText.isVisible = false
-            binding.searchAnimation.isVisible = true
+            binding.clError.visibility = View.GONE
+            binding.tvPhoneticsText.visibility = View.GONE
+            binding.searchAnimation.visibility = View.VISIBLE
 
             val word = args.word
             val response: DictionarySingleResponseModel = try {
                 RetrofitService.api.getDefinitions("en_US", word)[0]
             } catch (e: IOException) { // when there is no internet access
-                binding.clError.isVisible = true
-                binding.lotErrorAnimation.setAnimation(R.raw.no_internet_animation)
-                binding.tvErrorMessage.text =
-                    requireContext().getString(R.string.no_internet_connection)
-                binding.searchAnimation.isVisible = false
+                setNoInternetState()
                 return@launchWhenCreated
             } catch (e: HttpException) { // when no result is found
-                binding.clError.isVisible = true
+                binding.clError.visibility = View.VISIBLE
                 binding.lotErrorAnimation.setAnimation(R.raw.no_result_cloud_animation)
                 binding.tvErrorMessage.text = requireContext().getString(R.string.not_found, word)
-                binding.searchAnimation.isVisible = false
+                binding.searchAnimation.visibility = View.GONE
                 return@launchWhenCreated
             }
-            binding.searchAnimation.isVisible = false
+            binding.searchAnimation.visibility = View.GONE
 
             binding.tvWord.text = response.word
             binding.tvPartOfSpeech.text = requireContext().getString(
@@ -103,7 +105,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         val phonetics = phoneticsList[0]
 
         binding.tvPhoneticsText.apply {
-            isVisible = true
+            visibility = View.VISIBLE
             text = phonetics.text
 
             icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_pronounce)
@@ -138,5 +140,38 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
     private fun setupRecyclerView() = binding.rvMeanings.apply {
         adapter = defAdapter
         layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    private fun setNoInternetState() {
+        binding.clError.visibility = View.GONE
+        binding.rvMeanings.visibility = View.GONE
+        binding.lotErrorAnimation.setAnimation(R.raw.no_internet_animation)
+        binding.tvErrorMessage.text = requireContext().getString(R.string.no_internet_connection)
+        binding.searchAnimation.visibility = View.GONE
+    }
+
+    private fun isInternetAvailable() : Boolean {
+        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val activeNetwork = connectivityManager.activeNetwork ?: return false
+            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+
+            return when {
+                capabilities.hasTransport(TRANSPORT_WIFI) -> true
+                capabilities.hasTransport(TRANSPORT_CELLULAR) -> true
+                capabilities.hasTransport(TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            connectivityManager.activeNetworkInfo?.run {
+                return when (type) {
+                    TYPE_WIFI -> true
+                    TYPE_MOBILE -> true
+                    TYPE_ETHERNET -> true
+                    else -> false
+                }
+            }
+        }
+        return false
     }
 }
