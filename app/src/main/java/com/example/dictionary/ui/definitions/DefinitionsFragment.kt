@@ -61,7 +61,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
 
     private fun initRequestToApi() {
         if (!isInternetAvailable())
-            return
+            setNoInternetState()
 
         lifecycleScope.launchWhenCreated {
             binding.clError.visibility = View.GONE
@@ -142,12 +142,12 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         layoutManager = LinearLayoutManager(requireContext())
     }
 
-    private fun setNoInternetState() {
-        binding.clError.visibility = View.GONE
-        binding.rvMeanings.visibility = View.GONE
-        binding.lotErrorAnimation.setAnimation(R.raw.no_internet_animation)
-        binding.tvErrorMessage.text = requireContext().getString(R.string.no_internet_connection)
-        binding.searchAnimation.visibility = View.GONE
+    private fun setNoInternetState() = with(binding) {
+        clError.visibility = View.GONE
+        rvMeanings.visibility = View.GONE
+        searchAnimation.visibility = View.GONE
+        lotErrorAnimation.setAnimation(R.raw.no_internet_animation)
+        tvErrorMessage.text = requireContext().getString(R.string.no_internet_connection)
     }
 
     private fun isInternetAvailable() : Boolean {

@@ -20,6 +20,7 @@
             app:titleTextColor="@android:color/white"
             app:title="@string/app_name"
             app:navigationIconTint="@android:color/white"
+            app:navigationIcon="@drawable/ic_round_arrow_back_ios_24"
             />
 
     </com.google.android.material.appbar.AppBarLayout>
