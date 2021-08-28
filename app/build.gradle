@@ -66,4 +66,7 @@ dependencies {
 
     def lottieVersion = "3.7.0"
     implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    // EventBus
+    implementation 'org.greenrobot:eventbus:3.2.0'
 }

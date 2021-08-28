@@ -8,9 +8,9 @@ import android.net.NetworkCapabilities.*
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -22,9 +22,10 @@ import com.example.dictionary.network.model.PhoneticsModel
 import com.example.dictionary.network.util.RetrofitService
 import com.example.dictionary.ui.main.IMainActivity
 import com.google.android.material.snackbar.Snackbar
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import retrofit2.HttpException
 import java.io.IOException
-import java.lang.Exception
 
 class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
     private lateinit var binding: FragmentDefinitionsBinding
@@ -50,25 +51,34 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         setupRecyclerView()
-        initRequestToApi()
+        initRequestToApi(args.word)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this)
     }
 
     override fun onStop() {
-        super.onStop()
-        mediaPlayer?.release()
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this)
         mediaPlayer = null
+        mediaPlayer?.release()
+        super.onStop()
     }
 
-    private fun initRequestToApi() {
+    @Subscribe
+    fun initRequestToApi(word: String) {
         if (!isInternetAvailable())
             setNoInternetState()
 
         lifecycleScope.launchWhenCreated {
             binding.clError.visibility = View.GONE
+            binding.rvMeanings.visibility = View.GONE
             binding.tvPhoneticsText.visibility = View.GONE
             binding.searchAnimation.visibility = View.VISIBLE
 
-            val word = args.word
             val response: DictionarySingleResponseModel = try {
                 RetrofitService.api.getDefinitions("en_US", word)[0]
             } catch (e: IOException) { // when there is no internet access
@@ -77,12 +87,14 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
             } catch (e: HttpException) { // when no result is found
                 binding.clError.visibility = View.VISIBLE
                 binding.lotErrorAnimation.setAnimation(R.raw.no_result_cloud_animation)
+                binding.rvMeanings.visibility = View.GONE
+                binding.tvWord.visibility = View.GONE
                 binding.tvErrorMessage.text = requireContext().getString(R.string.not_found, word)
                 binding.searchAnimation.visibility = View.GONE
                 return@launchWhenCreated
             }
             binding.searchAnimation.visibility = View.GONE
-
+            binding.rvMeanings.visibility = View.VISIBLE
             binding.tvWord.text = response.word
             binding.tvPartOfSpeech.text = requireContext().getString(
                 R.string.part_of_speech,
@@ -117,11 +129,9 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
             try {
                 mediaPlayer!!.setDataSource(audioLink)
                 mediaPlayer!!.prepareAsync()
-            }
-            catch (e: IOException) {
+            } catch (e: IOException) {
                 Snackbar.make(this, "Some error", Snackbar.LENGTH_SHORT).show()
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
 
@@ -129,8 +139,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
                 Log.d(TAG, "bindClickablePronunciationText: $audioLink")
                 try {
                     mediaPlayer!!.start()
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
@@ -150,11 +159,13 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         tvErrorMessage.text = requireContext().getString(R.string.no_internet_connection)
     }
 
-    private fun isInternetAvailable() : Boolean {
-        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private fun isInternetAvailable(): Boolean {
+        val connectivityManager =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
 
             return when {
                 capabilities.hasTransport(TRANSPORT_WIFI) -> true

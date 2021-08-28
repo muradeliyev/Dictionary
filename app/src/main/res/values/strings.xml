@@ -8,4 +8,5 @@
     <string name="part_of_speech">(%1$s)</string>
     <string name="no_internet_connection">No Internet connection!</string>
     <string name="not_found">\"%1$s\" is not found :(</string>
+    <string name="underlined_text"><u>%1$s</u></string>
 </resources>

@@ -3,6 +3,7 @@ package com.example.dictionary.ui.definitions
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -10,11 +11,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.dictionary.R
 import com.example.dictionary.databinding.ItemLayoutDefinitionBinding
 import com.example.dictionary.network.model.DefinitionModel
+import org.greenrobot.eventbus.EventBus
 
 class DefinitionRVAdapter(
     private val context: Context
 ) : RecyclerView.Adapter<DefinitionRVAdapter.DefinitionViewHolder>() {
-    inner class DefinitionViewHolder(val binding: ItemLayoutDefinitionBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class DefinitionViewHolder(val binding: ItemLayoutDefinitionBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     private val diffCallback = object : DiffUtil.ItemCallback<DefinitionModel>() {
         override fun areItemsTheSame(oldItem: DefinitionModel, newItem: DefinitionModel): Boolean {
@@ -34,7 +37,7 @@ class DefinitionRVAdapter(
         get() = differ.currentList
         set(value) {
             differ.submitList(value)
-    }
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DefinitionViewHolder {
         return DefinitionViewHolder(
@@ -48,22 +51,29 @@ class DefinitionRVAdapter(
 
     override fun onBindViewHolder(holder: DefinitionViewHolder, position: Int) {
         val definitionModel = differ.currentList[position]
-        with (holder.binding) {
+        with(holder.binding) {
             tvDefinition.text = definitionModel.definition
 
-            with (definitionModel.synonyms) {
-                if (this == null) {
-                    tvSynonyms.isVisible = false
-                } else {
-                    for (i in indices) {
-                        tvSynonyms.append("${this[i]}\n")
-                    }
+            definitionModel.synonyms?.let {
+                it.forEach { synonym ->
+                    val synonymView = LayoutInflater.from(context)
+                        .inflate(R.layout.item_synonym, null) as TextView
+
+                    if (!synonym.contains(" ")) {
+                        synonymView.setOnClickListener {
+                            EventBus.getDefault().post(synonym)
+                        }
+                        synonymView.text = context.getString(R.string.underlined_text, synonym)
+                    } else synonymView.text = synonym
+
+                    llSynonyms.addView(synonymView)
                 }
             }
-            if (definitionModel.example != null)
-                tvExample.text = context.getString(R.string.example, definitionModel.example)
-            else
-                tvExample.isVisible = false
+
+            // setting Examples for the definition
+            if (definitionModel.example != null) tvExample.text =
+                context.getString(R.string.example, definitionModel.example)
+            else tvExample.isVisible = false
         }
     }
 
