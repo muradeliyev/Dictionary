@@ -42,6 +42,7 @@
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:clickable="false"
             android:insetLeft="0dp"
             android:insetTop="0dp"
             android:insetRight="0dp"
@@ -49,19 +50,18 @@
             android:textAllCaps="false"
             android:textColor="#1dace2"
             android:textSize="14sp"
+            android:visibility="gone"
             app:cornerRadius="50dp"
             app:iconPadding="0dp"
             app:iconSize="16dp"
-            app:rippleColor="@color/light_bluish"
             app:iconTint="@color/light_bluish"
-            android:clickable="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/tvPartOfSpeech"
             app:layout_constraintTop_toTopOf="parent"
+            app:rippleColor="@color/light_bluish"
             tools:icon="@drawable/ic_play_24"
-            tools:text="/pronunciation/"
-            />
+            tools:text="/pronunciation/" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -81,41 +81,41 @@
         android:id="@+id/clError"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/lotErrorAnimation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:lottie_loop="true"
+            app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="true"
-            />
+            app:lottie_loop="true" />
 
         <TextView
             android:id="@+id/tvErrorMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintVertical_bias="0.8"
             android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.8" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/searchAnimation"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:lottie_rawRes="@raw/search_animation"
-        app:lottie_loop="true"
         app:lottie_autoPlay="true"
-        />
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/search_animation" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,20 +5,19 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dictionary.R
 import com.example.dictionary.databinding.FragmentSearchBinding
 import com.example.dictionary.ui.main.IMainActivity
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class SearchFragment : Fragment(R.layout.fragment_search) {
     private lateinit var binding: FragmentSearchBinding
 
@@ -39,12 +38,13 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     }
 
     private fun closeKeyboard() = activity?.currentFocus?.let { view ->
-            val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun openKeyboard() {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(binding.etSearch, InputMethodManager.SHOW_IMPLICIT)
     }
 
@@ -54,7 +54,8 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     val word = binding.etSearch.text.toString()
                     if (word.isNotEmpty()) {
-                        val action = SearchFragmentDirections.actionSearchFragmentToDefinitionsFragment(word)
+                        val action =
+                            SearchFragmentDirections.actionSearchFragmentToDefinitionsFragment(word)
 
                         closeKeyboard()
                         findNavController().navigate(action)
@@ -70,11 +71,22 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             override fun onTextChanged(s: CharSequence?, after: Int, before: Int, count: Int) {
                 s?.let {
                     if (s.isEmpty())
-                        etSearch.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search_24, 0, 0, 0)
+                        etSearch.setCompoundDrawablesWithIntrinsicBounds(
+                            R.drawable.ic_search_24,
+                            0,
+                            0,
+                            0
+                        )
                     else
-                        etSearch.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search_24, 0, R.drawable.ic_round_clear_24, 0)
+                        etSearch.setCompoundDrawablesWithIntrinsicBounds(
+                            R.drawable.ic_search_24,
+                            0,
+                            R.drawable.ic_round_clear_24,
+                            0
+                        )
                 }
             }
+
             override fun afterTextChanged(p0: Editable?) = Unit
         })
 

@@ -8,10 +8,11 @@ import android.net.NetworkCapabilities.*
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,14 +20,18 @@ import com.example.dictionary.R
 import com.example.dictionary.databinding.FragmentDefinitionsBinding
 import com.example.dictionary.network.model.DictionarySingleResponseModel
 import com.example.dictionary.network.model.PhoneticsModel
-import com.example.dictionary.network.util.RetrofitService
 import com.example.dictionary.ui.main.IMainActivity
+import com.example.dictionary.utils.State
+import com.example.dictionary.viewmodels.DictionaryViewModel
 import com.google.android.material.snackbar.Snackbar
-import retrofit2.HttpException
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
-import java.lang.Exception
 
+@AndroidEntryPoint
 class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
+
+    private val viewModel: DictionaryViewModel by activityViewModels()
+
     private lateinit var binding: FragmentDefinitionsBinding
     private lateinit var defAdapter: DefinitionRVAdapter
     private lateinit var audioLink: String
@@ -50,7 +55,8 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
         setupRecyclerView()
-        initRequestToApi()
+        viewModel.getDefinition(args.word)
+        setupObservers()
     }
 
     override fun onStop() {
@@ -59,43 +65,44 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         mediaPlayer = null
     }
 
-    private fun initRequestToApi() {
-        if (!isInternetAvailable())
-            setNoInternetState()
+    private fun setupObservers() {
+        viewModel.definition.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is State.Loading -> setLoadingState()
+                is State.NoInternet -> setNoInternetState()
+                is State.Error -> setNoResultState(state.message)
+                is State.Success<*> -> {
+                    val data = state.data as DictionarySingleResponseModel
 
-        lifecycleScope.launchWhenCreated {
-            binding.clError.visibility = View.GONE
-            binding.tvPhoneticsText.visibility = View.GONE
-            binding.searchAnimation.visibility = View.VISIBLE
+                    binding.tvWord.text = data.word
+                    binding.tvPartOfSpeech.text = requireContext().getString(
+                        R.string.part_of_speech,
+                        data.meanings[0].partOfSpeech
+                    )
+                    defAdapter.list = data.meanings[0].definitions
+                    audioLink = data.phonetics[0].audioUrl.toString()
 
-            val word = args.word
-            val response: DictionarySingleResponseModel = try {
-                RetrofitService.api.getDefinitions("en_US", word)[0]
-            } catch (e: IOException) { // when there is no internet access
-                setNoInternetState()
-                return@launchWhenCreated
-            } catch (e: HttpException) { // when no result is found
-                binding.clError.visibility = View.VISIBLE
-                binding.lotErrorAnimation.setAnimation(R.raw.no_result_cloud_animation)
-                binding.tvErrorMessage.text = requireContext().getString(R.string.not_found, word)
-                binding.searchAnimation.visibility = View.GONE
-                return@launchWhenCreated
+                    if (!audioLink.startsWith("https://"))
+                        audioLink = "https://$audioLink"
+
+                    bindClickablePronunciationText(data.phonetics)
+                }
             }
-            binding.searchAnimation.visibility = View.GONE
-
-            binding.tvWord.text = response.word
-            binding.tvPartOfSpeech.text = requireContext().getString(
-                R.string.part_of_speech,
-                response.meanings[0].partOfSpeech
-            )
-            defAdapter.list = response.meanings[0].definitions
-            audioLink = response.phonetics[0].audioUrl.toString()
-
-            if (!audioLink.startsWith("https://"))
-                audioLink = "https://$audioLink"
-
-            bindClickablePronunciationText(response.phonetics)
         }
+    }
+
+    private fun setLoadingState() {
+        binding.clError.visibility = View.GONE
+        binding.tvPhoneticsText.visibility = View.GONE
+        binding.searchAnimation.visibility = View.VISIBLE
+    }
+
+    private fun setNoResultState(word: String) {
+        binding.clError.visibility = View.VISIBLE
+        binding.tvPhoneticsText.visibility = View.GONE
+        binding.lotErrorAnimation.setAnimation(R.raw.no_result_cloud_animation)
+        binding.tvErrorMessage.text = requireContext().getString(R.string.not_found, word)
+        binding.searchAnimation.visibility = View.GONE
     }
 
     private fun bindClickablePronunciationText(phoneticsList: List<PhoneticsModel>) {
@@ -117,11 +124,9 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
             try {
                 mediaPlayer!!.setDataSource(audioLink)
                 mediaPlayer!!.prepareAsync()
-            }
-            catch (e: IOException) {
+            } catch (e: IOException) {
                 Snackbar.make(this, "Some error", Snackbar.LENGTH_SHORT).show()
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
 
@@ -129,8 +134,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
                 Log.d(TAG, "bindClickablePronunciationText: $audioLink")
                 try {
                     mediaPlayer!!.start()
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
@@ -150,11 +154,13 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         tvErrorMessage.text = requireContext().getString(R.string.no_internet_connection)
     }
 
-    private fun isInternetAvailable() : Boolean {
-        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private fun isInternetAvailable(): Boolean {
+        val connectivityManager =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
 
             return when {
                 capabilities.hasTransport(TRANSPORT_WIFI) -> true
@@ -174,4 +180,5 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         }
         return false
     }
+
 }
