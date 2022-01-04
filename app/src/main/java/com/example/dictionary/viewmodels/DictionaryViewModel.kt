@@ -25,11 +25,11 @@ class DictionaryViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val definitions = repo.getDefinitions("en_US", word)
-                _definition.value = State.Success(definitions[0])
-            } catch (e: HttpException) {
-                _definition.value = State.NoInternet
+                _definition.postValue(State.Success(definitions[0]))
             } catch (e: IOException) {
-                _definition.value = State.Error(word)
+                _definition.postValue(State.NoInternet)
+            } catch (e: HttpException) {
+                _definition.postValue(State.Error(word))
             }
         }
     }

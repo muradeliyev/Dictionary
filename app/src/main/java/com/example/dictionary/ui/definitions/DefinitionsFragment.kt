@@ -72,6 +72,8 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
                 is State.NoInternet -> setNoInternetState()
                 is State.Error -> setNoResultState(state.message)
                 is State.Success<*> -> {
+                    binding.searchAnimation.visibility = View.GONE
+
                     val data = state.data as DictionarySingleResponseModel
 
                     binding.tvWord.text = data.word
@@ -97,12 +99,13 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         binding.searchAnimation.visibility = View.VISIBLE
     }
 
-    private fun setNoResultState(word: String) {
-        binding.clError.visibility = View.VISIBLE
-        binding.tvPhoneticsText.visibility = View.GONE
-        binding.lotErrorAnimation.setAnimation(R.raw.no_result_cloud_animation)
-        binding.tvErrorMessage.text = requireContext().getString(R.string.not_found, word)
-        binding.searchAnimation.visibility = View.GONE
+    private fun setNoResultState(word: String) = with(binding) {
+        clError.visibility = View.VISIBLE
+        tvPhoneticsText.visibility = View.GONE
+        clError.visibility = View.VISIBLE
+        lotErrorAnimation.setAnimation(R.raw.no_result_cloud_animation)
+        tvErrorMessage.text = requireContext().getString(R.string.not_found, word)
+        searchAnimation.visibility = View.GONE
     }
 
     private fun bindClickablePronunciationText(phoneticsList: List<PhoneticsModel>) {
@@ -150,6 +153,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         clError.visibility = View.GONE
         rvMeanings.visibility = View.GONE
         searchAnimation.visibility = View.GONE
+        clError.visibility = View.VISIBLE
         lotErrorAnimation.setAnimation(R.raw.no_internet_animation)
         tvErrorMessage.text = requireContext().getString(R.string.no_internet_connection)
     }
