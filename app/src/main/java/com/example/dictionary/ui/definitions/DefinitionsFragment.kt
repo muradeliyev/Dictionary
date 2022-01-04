@@ -71,24 +71,7 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
                 is State.Loading -> setLoadingState()
                 is State.NoInternet -> setNoInternetState()
                 is State.Error -> setNoResultState(state.message)
-                is State.Success<*> -> {
-                    binding.searchAnimation.visibility = View.GONE
-
-                    val data = state.data as DictionarySingleResponseModel
-
-                    binding.tvWord.text = data.word
-                    binding.tvPartOfSpeech.text = requireContext().getString(
-                        R.string.part_of_speech,
-                        data.meanings[0].partOfSpeech
-                    )
-                    defAdapter.list = data.meanings[0].definitions
-                    audioLink = data.phonetics[0].audioUrl.toString()
-
-                    if (!audioLink.startsWith("https://"))
-                        audioLink = "https://$audioLink"
-
-                    bindClickablePronunciationText(data.phonetics)
-                }
+                is State.Success<*> -> setSuccessState(state.data as DictionarySingleResponseModel)
             }
         }
     }
@@ -99,6 +82,15 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         binding.searchAnimation.visibility = View.VISIBLE
     }
 
+    private fun setNoInternetState() = with(binding) {
+        clError.visibility = View.GONE
+        rvMeanings.visibility = View.GONE
+        searchAnimation.visibility = View.GONE
+        clError.visibility = View.VISIBLE
+        lotErrorAnimation.setAnimation(R.raw.no_internet_animation)
+        tvErrorMessage.text = requireContext().getString(R.string.no_internet_connection)
+    }
+
     private fun setNoResultState(word: String) = with(binding) {
         clError.visibility = View.VISIBLE
         tvPhoneticsText.visibility = View.GONE
@@ -106,6 +98,23 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
         lotErrorAnimation.setAnimation(R.raw.no_result_cloud_animation)
         tvErrorMessage.text = requireContext().getString(R.string.not_found, word)
         searchAnimation.visibility = View.GONE
+    }
+
+    private fun setSuccessState(data: DictionarySingleResponseModel) {
+        binding.searchAnimation.visibility = View.GONE
+
+        binding.tvWord.text = data.word
+        binding.tvPartOfSpeech.text = requireContext().getString(
+            R.string.part_of_speech,
+            data.meanings[0].partOfSpeech
+        )
+        defAdapter.list = data.meanings[0].definitions
+        audioLink = data.phonetics[0].audioUrl.toString()
+
+        if (!audioLink.startsWith("https://"))
+            audioLink = "https://$audioLink"
+
+        bindClickablePronunciationText(data.phonetics)
     }
 
     private fun bindClickablePronunciationText(phoneticsList: List<PhoneticsModel>) {
@@ -147,15 +156,6 @@ class DefinitionsFragment : Fragment(R.layout.fragment_definitions) {
     private fun setupRecyclerView() = binding.rvMeanings.apply {
         adapter = defAdapter
         layoutManager = LinearLayoutManager(requireContext())
-    }
-
-    private fun setNoInternetState() = with(binding) {
-        clError.visibility = View.GONE
-        rvMeanings.visibility = View.GONE
-        searchAnimation.visibility = View.GONE
-        clError.visibility = View.VISIBLE
-        lotErrorAnimation.setAnimation(R.raw.no_internet_animation)
-        tvErrorMessage.text = requireContext().getString(R.string.no_internet_connection)
     }
 
     private fun isInternetAvailable(): Boolean {
